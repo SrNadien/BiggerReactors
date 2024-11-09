@@ -150,7 +150,7 @@ public class ReactorMultiblockController extends MultiblockController<ReactorBas
                 final var tile = blocks.getTile(x, i, z);
                 
                 if (!(tile instanceof ReactorFuelRodTile)) {
-                    throw new ValidationException(Component.translatable("multiblock.error.biggerreactors.fuel_rod_gap", controlRodPos.getX(), controlRodPos.getY() + (-1 - i), controlRodPos.getZ()));
+                    throw new ValidationException(Component.translatable("multiblock.error.biggerreactors.fuel_rod_gap", controlRodPos.getX(), i, controlRodPos.getZ()));
                 }
                 
                 ((ReactorFuelRodTile) tile).lastCheckedTick = tick;
