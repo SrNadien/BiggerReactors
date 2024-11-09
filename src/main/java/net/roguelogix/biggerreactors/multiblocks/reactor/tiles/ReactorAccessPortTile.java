@@ -354,4 +354,10 @@ public class ReactorAccessPortTile extends ReactorBaseTile implements IItemHandl
         reactorAccessPortState.direction = (this.direction == INLET);
         reactorAccessPortState.fuelMode = this.fuelMode;
     }
+    
+    @Override
+    public void onRemoved(boolean chunkUnload) {
+        super.onRemoved(chunkUnload);
+        itemStackHandler.invalidate();
+    }
 }

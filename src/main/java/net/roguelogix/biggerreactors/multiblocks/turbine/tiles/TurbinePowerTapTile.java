@@ -121,4 +121,10 @@ public class TurbinePowerTapTile extends TurbineBaseTile implements IEnergyTile,
         }
         neighborChanged();
     }
+    
+    @Override
+    public void onRemoved(boolean chunkUnload) {
+        super.onRemoved(chunkUnload);
+        thisCap.invalidate();
+    }
 }

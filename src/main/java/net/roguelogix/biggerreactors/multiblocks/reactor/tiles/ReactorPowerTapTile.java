@@ -144,4 +144,10 @@ public class ReactorPowerTapTile extends ReactorBaseTile implements IEnergyTile,
         }
         neighborChanged();
     }
+    
+    @Override
+    public void onRemoved(boolean chunkUnload) {
+        super.onRemoved(chunkUnload);
+        thisCap.invalidate();
+    }
 }
