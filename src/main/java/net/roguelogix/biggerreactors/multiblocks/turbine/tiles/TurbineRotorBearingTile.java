@@ -28,6 +28,8 @@ import org.joml.Vector4i;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.ArrayList;
 
 import static net.roguelogix.phosphophyllite.multiblock.IAssemblyStateBlock.ASSEMBLED;
@@ -36,7 +38,7 @@ import static net.roguelogix.phosphophyllite.multiblock.IAssemblyStateBlock.ASSE
 @MethodsReturnNonnullByDefault
 public class TurbineRotorBearingTile extends TurbineBaseTile implements IEventMultiblock.AssemblyStateTransition {
     
-    public static boolean APRIL_FOOLS_JOKE = false;
+    public static final boolean APRIL_FOOLS_JOKE = LocalDateTime.now().getMonth() == Month.APRIL && LocalDateTime.now().getDayOfMonth() == 1;
     
     @RegisterTile("turbine_rotor_bearing")
     public static final RegisterTile.Producer<TurbineRotorBearingTile> SUPPLIER = new RegisterTile.Producer<>(TurbineRotorBearingTile::new);
