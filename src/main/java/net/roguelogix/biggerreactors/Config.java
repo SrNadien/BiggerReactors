@@ -1,10 +1,14 @@
 package net.roguelogix.biggerreactors;
 
+import net.minecraft.resources.ResourceLocation;
 import net.roguelogix.phosphophyllite.config.ConfigFormat;
 import net.roguelogix.phosphophyllite.config.ConfigType;
 import net.roguelogix.phosphophyllite.config.ConfigValue;
 import net.roguelogix.phosphophyllite.registry.RegisterConfig;
+import net.roguelogix.phosphophyllite.util.NonnullDefault;
+import org.jetbrains.annotations.Nullable;
 
+@NonnullDefault
 @SuppressWarnings("unused")
 public class Config {
     
@@ -61,6 +65,14 @@ public class Config {
             PassiveOutputMultiplier = 0.5f;
             ActiveOutputMultiplier = 1.0f;
             FuelMBPerIngot = 1000;
+        }
+        
+        @Nullable
+        @ConfigValue
+        public final ResourceLocation FuelOutputItem;
+        
+        {
+            FuelOutputItem = new ResourceLocation(BiggerReactors.modid, "uranium_ingot");
         }
         
         @ConfigValue(advanced = ConfigValue.BoolOption.True)

@@ -22,6 +22,7 @@ import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.wrapper.EmptyHandler;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.roguelogix.biggerreactors.Config;
 import net.roguelogix.biggerreactors.blocks.materials.MaterialBlock;
 import net.roguelogix.biggerreactors.items.ingots.BlutoniumIngot;
@@ -53,12 +54,24 @@ public class ReactorAccessPortTile extends ReactorBaseTile implements IItemHandl
     private static final TagKey<Item> uraniumIngotTag = TagKey.create(BuiltInRegistries.ITEM.key(), new ResourceLocation("forge:ingots/uranium"));
     private static final TagKey<Item> uraniumBlockTag = TagKey.create(BuiltInRegistries.ITEM.key(), new ResourceLocation("forge:storage_blocks/uranium"));
     
+    private final Item fuelOutputItem;
+    
     public static final int FUEL_SLOT = 0;
     public static final int WASTE_SLOT = 1;
     public static final int FUEL_INSERT_SLOT = 2;
     
     public ReactorAccessPortTile(BlockEntityType<?> tileEntityTypeIn, BlockPos pos, BlockState state) {
         super(tileEntityTypeIn, pos, state);
+        if (Config.CONFIG.Reactor.FuelOutputItem != null) {
+            @Nullable
+            var potentialOutput = ForgeRegistries.ITEMS.getValue(Config.CONFIG.Reactor.FuelOutputItem);
+            if (potentialOutput == null || !potentialOutput.builtInRegistryHolder().is(uraniumIngotTag)) {
+                potentialOutput = UraniumIngot.INSTANCE;
+            }
+            fuelOutputItem = potentialOutput;
+        } else {
+            fuelOutputItem = UraniumIngot.INSTANCE;
+        }
     }
     
     private ReactorAccessPort.PortDirection direction = INLET;
@@ -131,7 +144,7 @@ public class ReactorAccessPortTile extends ReactorBaseTile implements IItemHandl
             return ItemStack.EMPTY;
         }
         var reactorSim = controller().simulation();
-        if(reactorSim == null){
+        if (reactorSim == null) {
             return ItemStack.EMPTY;
         }
         if (slot == WASTE_SLOT) {
@@ -139,7 +152,7 @@ public class ReactorAccessPortTile extends ReactorBaseTile implements IItemHandl
             return new ItemStack(CyaniteIngot.INSTANCE, (int) availableIngots);
         } else if (slot == FUEL_SLOT) {
             long availableIngots = reactorSim.fuelTank().fuel() / Config.CONFIG.Reactor.FuelMBPerIngot;
-            return new ItemStack(UraniumIngot.INSTANCE, (int) availableIngots);
+            return new ItemStack(fuelOutputItem, (int) availableIngots);
         } else {
             return ItemStack.EMPTY;
         }
@@ -189,7 +202,7 @@ public class ReactorAccessPortTile extends ReactorBaseTile implements IItemHandl
             long toExtracted = maxExtractable - (maxExtractable % Config.CONFIG.Reactor.FuelMBPerIngot);
             long extracted = controller().extractFuel(toExtracted, simulate);
             
-            return new ItemStack(UraniumIngot.INSTANCE, (int) Math.min(amount, extracted / Config.CONFIG.Reactor.FuelMBPerIngot));
+            return new ItemStack(fuelOutputItem, (int) Math.min(amount, extracted / Config.CONFIG.Reactor.FuelMBPerIngot));
         }
         
         return ItemStack.EMPTY;
@@ -201,7 +214,7 @@ public class ReactorAccessPortTile extends ReactorBaseTile implements IItemHandl
             return 0;
         }
         var reactorSim = controller().simulation();
-        if(reactorSim == null){
+        if (reactorSim == null) {
             return 0;
         }
         return (int) (reactorSim.fuelTank().capacity() / Config.CONFIG.Reactor.FuelMBPerIngot);
@@ -213,7 +226,7 @@ public class ReactorAccessPortTile extends ReactorBaseTile implements IItemHandl
             return stack.getItem().builtInRegistryHolder().is(uraniumIngotTag) || stack.getItem() == BlutoniumIngot.INSTANCE
                     || stack.getItem().builtInRegistryHolder().is(uraniumBlockTag) || stack.getItem() == MaterialBlock.BLUTONIUM.asItem();
         } else if (slot == FUEL_SLOT) {
-            return stack.getItem() == UraniumIngot.INSTANCE;
+            return stack.getItem() == fuelOutputItem;
         } else {
             return stack.getItem() == CyaniteIngot.INSTANCE;
         }
@@ -251,7 +264,7 @@ public class ReactorAccessPortTile extends ReactorBaseTile implements IItemHandl
                 if (fuel == 0) {
                     break;
                 }
-                ItemStack toInsertStack = new ItemStack(UraniumIngot.INSTANCE, fuel);
+                ItemStack toInsertStack = new ItemStack(fuelOutputItem, fuel);
                 ItemStack remainingStack = output.insertItem(i, toInsertStack, simulated);
                 fuelHandled += toInsertStack.getCount() - remainingStack.getCount();
                 fuel -= toInsertStack.getCount() - remainingStack.getCount();
