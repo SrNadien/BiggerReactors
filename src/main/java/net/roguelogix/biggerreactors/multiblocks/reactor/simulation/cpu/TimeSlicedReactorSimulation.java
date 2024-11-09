@@ -1,9 +1,9 @@
 package net.roguelogix.biggerreactors.multiblocks.reactor.simulation.cpu;
 
 import net.roguelogix.biggerreactors.Config;
+import net.roguelogix.biggerreactors.multiblocks.reactor.simulation.SimulationDescription;
 import net.roguelogix.biggerreactors.multiblocks.reactor.simulation.base.BaseReactorSimulation;
 import net.roguelogix.biggerreactors.multiblocks.reactor.simulation.base.SimUtil;
-import net.roguelogix.biggerreactors.multiblocks.reactor.simulation.SimulationDescription;
 import net.roguelogix.biggerreactors.registries.ReactorModeratorRegistry;
 
 import java.util.ArrayList;
@@ -13,7 +13,8 @@ import java.util.Random;
 
 public class TimeSlicedReactorSimulation extends BaseReactorSimulation {
     
-    private int currentRod = 0;
+    private int activeYLevel = -1;
+    private int currentRod = -1;
     private int rodOffset = 0;
     
     public TimeSlicedReactorSimulation(SimulationDescription simulationDescription) {
@@ -27,13 +28,17 @@ public class TimeSlicedReactorSimulation extends BaseReactorSimulation {
             return 0;
         }
         
-        // along with a shuffled array of control rods, this should be close enough to random, yet still cyclical
-        currentRod++;
-        if (currentRod >= controlRods.length) {
-            currentRod = 0;
+        // along with a shuffled array of control rods, this should be close enough to random, yet still cyclical given enough time
+        activeYLevel++;
+        if (activeYLevel >= y) {
             rodOffset++;
+            rodOffset %= controlRods.length;
+            currentRod = -1;
         }
-        int yLevel = currentRod % y;
+        activeYLevel %= y;
+        
+        currentRod++;
+        currentRod %= controlRods.length;
         int currentRod = this.currentRod + rodOffset;
         currentRod %= controlRods.length;
         
@@ -95,11 +100,11 @@ public class TimeSlicedReactorSimulation extends BaseReactorSimulation {
             for (int k = 0; k < raySteps.size(); k++) {
                 SimUtil.RayStep rayStep = raySteps.get(k);
                 final int currentX = rod.x + rayStep.offset.x;
-                final int currentY = yLevel + rayStep.offset.y;
+                final int currentY = activeYLevel + rayStep.offset.y;
                 final int currentZ = rod.z + rayStep.offset.z;
                 if (currentX < 0 || currentX >= this.x ||
-                            currentY < 0 || currentY >= this.y ||
-                            currentZ < 0 || currentZ >= this.z) {
+                        currentY < 0 || currentY >= this.y ||
+                        currentZ < 0 || currentZ >= this.z) {
                     break;
                 }
                 ReactorModeratorRegistry.IModeratorProperties properties = moderatorProperties[currentX][currentY][currentZ];
