@@ -1,3 +1,17 @@
+# 1.20.1-0.6.0-beta.10.5
+
+## Reactor
+ - Fix #102
+ - Fix #104
+ - Fix #98 for access port and power tap
+ - Add config option for fuel dump item
+
+## Turbine
+ - Fix #98 for power tap
+
+## Misc
+ - general optimizations
+
 # 1.20.1-0.6.0-beta.10.4
 
 ## Misc
